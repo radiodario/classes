@@ -168,6 +168,7 @@ var myNamespace = (function () {
 ### Advantages:
 * Makes it easier for OO developers (i.e people from a non-functional background) who miss Classes, rather than using trully functional encapsulation.
 * It supports private data
+
 ### Disadvantages:
 * Different way of accessing public and private members, If we want to change visibility we need to change everywhere the member was used
 * Can't access private members in methods added to the object at a later point.
@@ -190,31 +191,25 @@ var mySingleton = (function () {
   function init() {
 
     // Singleton
-
     // Private methods and variables
     function privateMethod(){
         console.log( "I am private" );
     }
 
     var privateVariable = "Im also private";
-
     var privateRandomNumber = Math.random();
 
     return {
-
       // Public methods and variables
       publicMethod: function () {
         console.log( "The public can see me!" );
       },
-
       publicProperty: "I am also public",
 
       getRandomNumber: function() {
         return privateRandomNumber;
       }
-
     };
-
   };
 
   return {
@@ -222,14 +217,11 @@ var mySingleton = (function () {
     // Get the Singleton instance if one exists
     // or create one if it doesn't
     getInstance: function () {
-
       if ( !instance ) {
         instance = init();
       }
-
       return instance;
     }
-
   };
 
 })();
@@ -244,14 +236,129 @@ If you find you need a singleton, perhaps you might have to reevaluate your desi
 
 
 ## Observer Pattern
-The Observer is a design pattern where an object (the subject) mantains a list of objects depending on it (observers), automatically notifying them of any changes to state.
+The Observer is a design pattern where an object (the *subject*) mantains a list of objects depending on it (*observers*), automatically notifying them of any changes to state.
+
+If somethign interesting happens, the subject can notify all observers, broadcasing a notification which can include data related to the topic of the notification.
+
+If an observer does no longer wish to be notified of changes, the subject can remove it from its list of observers.
+
+#### Gang of Four (GoF) definition:
+> "One or more observers are interested in the state of a subject and register their interest with the subject by attaching themselves. When something changes in our subject that the observer may be interested in, a notify message is sent which calls the update method in each observer. When the observer is no longer interested in the subject's state, they can simply detach themselves."
+
+### Implementing the Observer Pattern
+The Observer pattern can be implemented with the following componenr
+* *Subject*: Mantains the list of observers, adds, or removes them.
+* *Observer*: Provides an update interface for objects that need to be notified of a change of state in a Subject, i.e. a function that can be called when the state thanges *callback*
+* *ConcreteSubject*: Broadcasts notifications to observers on changes of state, stores the state of ConcreteObservers.
+* *ConcreteObserver*: Stores a reference to the ConcreteSubject, implements an update interface for the Observer to ensure state is consistent with the Subject's
+
+#### Observer list
+```javascript
+function ObserverList() {
+  this.observerList = [];
+}
+
+ObserverList.prototype.add = function(obj) {
+  return this.observerList.push(obj);
+};
+
+ObserverList.prototype.count = function() {
+  return this.observerList.length;
+};
+
+ObserverList.prototype.get = function(index) {
+  if (index > -1 && index < this.observerList.length) {
+    return this.observerList[index];
+  }
+};
+
+ObserverList.prototype.indexOf = function(obj, startIndex) {
+  var i = startIndex;
+  while (i < this.observerList.length) {
+    if (this.observerList[i] === obj) {
+      return i;
+    }
+    i++;
+  }
+  return -1;
+};
+
+ObserverList.prototype.removeAt = function(index) {
+  this.observerList.splice(index, 1);
+};
+```
+
+We have enabled the observerList to add, remove and get an observer. Now we will make it part of the Subject:
+```javascript
+function Subject() {
+  this.observers = new ObserverList();
+}
+
+Subject.prototype.addObserver = function(observer) {
+  this.observers.add(observer);
+};
+
+Subject.prototype.removeObserver = function(observer) {
+  this.observers.removeAt(this.observers.indexOf(observer, 0));
+};
+
+Subject.prototype.notify = function(context) {
+  var observerCount = this.observers.count();
+  for (var i = 0; i < observerCount; i++) {
+    this.observers.get(i).update(context);
+  }
+};
+
+```
+
+The skeleton for our observers will look as this:
+```javascript
+function Observer() {
+  this.update = function() {
+    // ...
+  }
+}
+```
+
+### The Publish/Subscribe Pattern
+This is a common variation on the Observer pattern commonly used in the Javascript world.
+
+The Observer parttern requires the observer wishing to receive topic notifications to subscribe this interest to the object emitting the events (subject).
+
+The Publish/Subscribe (PubSub for short) uses a *topic/event* channel which sits between the objects wishing to receive notifications (subscribers) and the object firing the events (the publisher). This allows us to avoid dependencies between the subscriber and the publisher.
+
+Any subscriber can then register for and receive topic notifications broadcast by the publisher by implementing an appropriate event handler.
+
+```javascript
+var unreadCount = 0;
+
+// we can have one subscriber listening to new messages
+var subs1 = subscribe("inbox/newMessage", function(topic, data) {
+  // * do something with the message
+  renderMessage(data);
+})
+
+var subs2 = subscribe("inbox/newMessage", function(topic, data) {
+  // maybe do something else
+  updateMessageCounter(++unreadCount);
+});
+
+// and somewhere else in the code
+publish("inbox/newMessage", [
+  {
+    sender: 'hello@google.com',
+    body: 'hey there! how is it going?'
+  }
+])
+```
+
+### Advantages
+* Makes us think about the relationships between different parts of our app
+* Helps us identify which layers containing direct relationships can be replaced with subjects + observers
+* Break down into smaller, loosely coupled blocks.
+
+## Command Pattern
 
 
+## Flyweight Pattern
 
-
-
-
-* Command
-* Flyweight
-
-Constructor
