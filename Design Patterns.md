@@ -1,4 +1,4 @@
-## What is a pattern?
+## What is a Design Pattern?
 
 Patterns are proven solutions to a problem that can be easily reused, like templates to solve a problem.
 
@@ -246,7 +246,7 @@ If an observer does no longer wish to be notified of changes, the subject can re
 > "One or more observers are interested in the state of a subject and register their interest with the subject by attaching themselves. When something changes in our subject that the observer may be interested in, a notify message is sent which calls the update method in each observer. When the observer is no longer interested in the subject's state, they can simply detach themselves."
 
 ### Implementing the Observer Pattern
-The Observer pattern can be implemented with the following componenr
+The Observer pattern can be implemented with the following components
 * *Subject*: Mantains the list of observers, adds, or removes them.
 * *Observer*: Provides an update interface for objects that need to be notified of a change of state in a Subject, i.e. a function that can be called when the state thanges *callback*
 * *ConcreteSubject*: Broadcasts notifications to observers on changes of state, stores the state of ConcreteObservers.
@@ -353,12 +353,205 @@ publish("inbox/newMessage", [
 ```
 
 ### Advantages
+* One of the most important patterns in JavaScript development
 * Makes us think about the relationships between different parts of our app
 * Helps us identify which layers containing direct relationships can be replaced with subjects + observers
-* Break down into smaller, loosely coupled blocks.
+* Break systems down into smaller, loosely coupled blocks.
+
+### Disadvantages
+* Harder to guarantee parts of the system function as we expect them to, if we make them too losely coupled
+* Subscribers don't know if publishers are working correctly
+
+## Prototype Pattern
+Creates objects based on a template of an existing object, through cloning.
+
+In prototypal inheritance we *avoid classes altogether* - We simply create copies of an existing object.
+
+Using the prototype pattern in Javascript is advantageous because prototypal inheritance is a *native feature* of the language. This can aid in performance, as functions are created by reference, rather than creating individual copies on each child.
+
+The standard way to create an object from a prototype in ECMAScript 5 is to use `Object.create`:
+```javascript
+var myCar = {
+  name: "Ford Escort",
+
+  drive: function() {
+    console.log("driving");
+  },
+
+  panic: function() {
+    console.log("stop!");
+  }
+
+}
+// use Object.create to instantiate a new car
+var yourCar = Object.create(myCar);
+```
+
+It is possible for objects to inherit from other objects, by using the second argument of `Object.create` which takes an object literal of properties that we want to initialise on the object:
+
+```javascript
+var vehicle = {
+  getModel: function() {
+    console.log("model of the vhicle", this.model);
+  }
+};
+
+var car = Object.create(vehicle, {
+  id: {
+    value: MY_GLOBAL.nextId(),
+    // writable: false, configurable: false //these are false by default
+    enumerable: true
+  },
+
+  model: {
+    value: "Ford Escort",
+    enumerable: true
+  }
+})
+```
+
+This is a rather complex way of establishing prototypal relationships. A simpler way involves overriding the `prototype` property of a function we return from another function:
+
+```javascript
+var vehiclePrototype = {
+  init: function (carModel) {
+    this.model = carModel;
+  },
+
+  getModel: function() {
+    console.log('our vehicle model is', this.model);
+  }
+};
+
+function vehicle(model) {
+  function F() {};
+  F.prototype = vehiclePrototype;
+
+  var f = new F();
+
+  f.init(model);
+  return f;
+}
+
+var car = vehicle("ford escort");
+car.getModel()
+```
+
+here `vehicle` emulates a constructor, since the prototype pattern does not include any notion of initialisation beyond linking an object to a prototype.
 
 ## Command Pattern
+The command pattern encapsulates method invocation, requests or operations into a single object.
+It gives us the ability to parameterize and pass method calls around that can be executed at our discretion.
+It also enables us to decouple objects invoking the action from the objects implementing them, giving us a greater degree of flexibility in swapping out concrete *classes*
 
+It provides us a means to seaparate the responsabilities of issuing commands from executing commands, enabling us to delegate this responsability.
+
+In the implementation, a simple command binds together an action and the object wishing to invoke the action. All command objects with the same interface can be easily swapped as needed, which is the best benefit of this pattern.
+
+Let's create a car purchasing service
+```javascript
+(function() {
+  var carManager = {
+    // request Information
+    requestInfo: function (model, id) {
+      return "the information for " + model + " width ID " + id + " is foobar";
+    },
+
+    // purchase the car
+    buyVehicle: function (model, id) {
+      return "You have successfully purchased Item " + id + ", a " + model;
+    },
+
+    arrangeViewing: function (model, id) {
+      return "you have successfully booked a viewing of " + model + " (" + id + ")";
+    }
+  };
+})();
+```
+
+While we could execute the methods in `carManager` directly, if the API behind it changes, we would require modifying all of the objects accessing it. Instead, we can abstract the API further
+
+We can expand our `carManager` so that our application of the Command pattern allows us to accept any named methods that can be performed on the `carManager` object, passing along any data to be used:
+
+```javascript
+carManager.execute("buyVehicle", "Ford Escort", "234556");
+```
+
+In order to do this, we must define an `execute` method as follows:
+```javascript
+carManager.execute = function (name) {
+  return carManager[name] && carManager[name].apply(carManager, [].slice.call(arguments, 1));
+}
+```
+
+That would allow us to do calls as follows:
+```javascript
+carManager.execute("arrangeViewing", "Ferrari", "14523");
+carManager.execute("requestInfo", "Ford Mondeo", "54323");
+carManager.execute("requestInfo", "Ford Escort", "34232");
+carManager.execute("buyVehicle", "Ford Escort", "34232");
+```
+
+## Mixin Pattern
+Mixins are classes which offer funcitonality that can be easily inherited by a subclass or group of subclasses for the purpose of funciton reuse.
+
+In JS, inheriting from Mixins can be seen as a way to collect functionality through extension. With prototypes, we can define properties for any number of object instances. We can use this to promote function re-use.
+
+Mixins allow objects to borrow functionality from them with a minimal amount of complexity, and we can implement this using Javascript's Object prototypes.
+
+Mixins can be seen as objects with attributes and methods than can be shared easily across a number of other object prototypes.
+```javascript
+var myMixins = {
+  moveUp: function() {
+    console.log("move up");
+  },
+
+  moveDown: function() {
+    console.log("move down");
+  },
+
+  stop: function() {
+    console.log("stop!")
+  }
+}
+```
+
+We can extend the prototype of *existing* constructor functions to include this behaviour using `Object.assign`:
+```javascript
+// a skeleton carAnimator constructor
+function CarAnimator() {
+  this.moveLeft = function() {
+    console.log("move left");
+  };
+}
+
+// a skeleton personAnimator constuctor
+function PersonAnimator() {
+  this.moveRandomly = function () {
+    /* ... */
+  }
+}
+
+// extend our prototypes with our mixin
+Object.assign(CarAnimator.prototype, myMixins);
+Object.assign(PersonAnimator.prototype, myMixins);
+
+// create a new instance of car Animator
+var myAnimator = new CarAnimator();
+myAnimator.moveLeft();
+myAnimator.moveRight();
+myAnimator.stop();
+```
+
+this allows us to *mix* in common behaviour into object constructors really easily.
+
+### Advantages
+* Mixins allow us to decrease functional repetition and increase function reuse in a system.
+* We can avoid duplication when shared behaviour is required across object instances
+
+### Disadvantages
+* Some developers feel injecting functionality into a prototype is a bad idea (prototype pollution)
+* Strong documentation can assist in minimizing this
 
 ## Flyweight Pattern
 
