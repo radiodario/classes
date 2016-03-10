@@ -567,8 +567,8 @@ function CommandHistory() {
 
 ## Enlaces y Leer Más
 
-[Más información sobre Singletons 🇬🇧](http://www.ibm.com/developerworks/webservices/library/co-single/index.html)
-[más información sobre Module 🇬🇧](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth)
-[Essential Javascript Patterns 🇬🇧](https://addyosmani.com/resources/essentialjsdesignpatterns/)
-[Game Programming Patterns 🇬🇧](http://gameprogrammingpatterns.com/contents.html)
-[Gang of Four Book 🇬🇧⚠️](http://www.amazon.es/Design-Patterns-Elements-Reusable-Object-Oriented-ebook/dp/B000SEIBB8)
+* [Más información sobre Singletons 🇬🇧](http://www.ibm.com/developerworks/webservices/library/co-single/index.html)
+* [más información sobre Module 🇬🇧](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth)
+* [Essential Javascript Patterns 🇬🇧](https://addyosmani.com/resources/essentialjsdesignpatterns/)
+* [Game Programming Patterns 🇬🇧](http://gameprogrammingpatterns.com/contents.html)
+* [Gang of Four Book 🇬🇧⚠️](http://www.amazon.es/Design-Patterns-Elements-Reusable-Object-Oriented-ebook/dp/B000SEIBB8)
