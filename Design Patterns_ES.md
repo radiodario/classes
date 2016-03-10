@@ -130,7 +130,7 @@ Se definen como una manera de crear *encapsulación* privada y pública, compara
 
 Como JS no tiene clases de manera nativa, usamos módulos para emularlas.
 
-# Usando Scope para emular Privacidad
+### Usando Scope para emular Privacidad
 Un Módulo encapsula la idea de "privacidad", estado y organización mediante *closures*. De esta manera, solo exponemos una API Pública, manteniendo el resto de métodos privados.
 
 Sin embargo Javascript, a diferencia de otros lenguajes orientados a objetos, no tiene concepto de `private` o `public`, así que usamos scope para emularlo:
@@ -368,6 +368,7 @@ publish("inbox/mensajeNuevo", [
 * Los subscriptores no saben si los publicadores estan funcionando correctamente
 
 
+
 ## Prototype Pattern
 Crea objetos basados en un patrón de un objeto existente, clonandolo.
 
@@ -562,3 +563,12 @@ function CommandHistory() {
 
 }
 ```
+
+
+## Enlaces y Leer Más
+
+[Más información sobre Singletons 🇬🇧](http://www.ibm.com/developerworks/webservices/library/co-single/index.html)
+[más información sobre Module 🇬🇧](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth)
+[Essential Javascript Patterns 🇬🇧](https://addyosmani.com/resources/essentialjsdesignpatterns/)
+[Game Programming Patterns 🇬🇧](http://gameprogrammingpatterns.com/contents.html)
+[Gang of Four Book 🇬🇧⚠️](http://www.amazon.es/Design-Patterns-Elements-Reusable-Object-Oriented-ebook/dp/B000SEIBB8)
